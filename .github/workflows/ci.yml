@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  installer:
+    name: Installer (Node.js ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["18", "20", "22"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Run installer tests
+        run: npm test
+
+  checker:
+    name: Commit checker (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Run commit checker tests
+        run: python3 -m unittest discover -s test -p "test_*.py"
+
+  skill-integrity:
+    name: Skill integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check SKILL.md frontmatter
+        run: |
+          set -eu
+          head -n 1 skill/SKILL.md | grep -qx -- "---"
+          grep -q "^name: git-use$" skill/SKILL.md
+          grep -q "^description: .*" skill/SKILL.md
+
+      - name: Check referenced files exist
+        run: |
+          set -eu
+          for file in skill/references/kernel-patch.md skill/references/pull-request.md \
+                      skill/scripts/check_commit_message.py skill/agents/openai.yaml; do
+            test -f "$file" || { echo "missing: $file"; exit 1; }
+          done
+
+      - name: Check the skill directory has no symlinks
+        run: |
+          set -eu
+          if find skill -type l | grep -q .; then
+            echo "symlink found in skill/"; find skill -type l; exit 1
+          fi
+
+      - name: Install into every supported agent target
+        run: |
+          set -eu
+          dest="$(mktemp -d)"
+          node bin/git-use-install.mjs install --all --dest "$dest"
+          test -f "$dest/git-use/SKILL.md"
+          test -f "$dest/git-use.md"
+          test -f "$dest/git-use.toml"
+          test -f "$dest/git-use.mdc"
+
+      - name: Check the repository commit message follows the skill rules
+        run: |
+          set -eu
+          git log -1 --format=%B | python3 skill/scripts/check_commit_message.py --require-disclosure -

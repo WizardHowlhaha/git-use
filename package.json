@@ -1,0 +1,52 @@
+{
+  "name": "git-use-skill",
+  "version": "1.0.0",
+  "description": "Linux-kernel-style Git commit, AI disclosure and PR content rules packaged as an installable agent skill",
+  "type": "module",
+  "private": false,
+  "bin": {
+    "git-use-skill": "bin/git-use-install.mjs"
+  },
+  "files": [
+    "bin",
+    "skill",
+    "docs",
+    "install.sh",
+    "README.md",
+    "README.en.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "test:python": "python3 -m unittest discover -s test -p 'test_*.py'",
+    "lint:commit": "python3 skill/scripts/check_commit_message.py --require-disclosure -"
+  },
+  "keywords": [
+    "agent-skill",
+    "skill",
+    "git",
+    "commit-message",
+    "pull-request",
+    "linux-kernel",
+    "ai-disclosure",
+    "codex",
+    "claude-code",
+    "cursor",
+    "gemini-cli",
+    "opencode"
+  ],
+  "author": "WizardHowlhaha",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WizardHowlhaha/git-use.git"
+  },
+  "homepage": "https://github.com/WizardHowlhaha/git-use#readme",
+  "bugs": {
+    "url": "https://github.com/WizardHowlhaha/git-use/issues"
+  }
+}
