@@ -1,6 +1,6 @@
 # git-use
 
-Linux-kernel-style Git commit, AI-disclosure and PR-content rules packaged as an installable **agent skill**.
+Linux-kernel-style Git commit and PR-content rules packaged as an installable **agent skill**.
 
 The repository is self-contained and ready to publish: the skill payload, a cross-agent installer, a validation script, tests and CI all live here.
 
@@ -13,7 +13,7 @@ The repository is self-contained and ready to publish: the skill payload, a cros
 | Commit message | `<subsystem>: <imperative summary>`, subject ≤ 50 display columns, body ≤ 75 display columns, one contiguous trailer block |
 | Process noise | Commands, test results and `Tested:` paragraphs belong in the chat report, not in the commit message |
 | Patch review | Staged patch is reviewed in a fixed order: `--check` → `--name-status/--stat` → full diff → `checkpatch.pl` |
-| AI disclosure | Trailer order is fixed: `AI-Assisted-By`, `AI-Model`, `Signed-off-by`, at the end of the body |
+| Commit sign-off | Use `git commit -s` to add the actual signer's `Signed-off-by` in the final trailer block |
 | PR content | English title, Chinese body; background → change summary → behaviour notes → per-commit rationale; updating a PR edits the body instead of appending a log |
 
 Full rules: [`skill/SKILL.md`](skill/SKILL.md), [`skill/references/kernel-patch.md`](skill/references/kernel-patch.md), [`skill/references/pull-request.md`](skill/references/pull-request.md). Rationale: [`docs/RULES.md`](docs/RULES.md).
@@ -53,7 +53,7 @@ Manual installation without Node.js, and per-agent notes: [`docs/INSTALL.md`](do
 ## Validate a commit message
 
 ```sh
-git show --format=%B --no-patch HEAD | python3 <skill-dir>/scripts/check_commit_message.py --require-disclosure -
+git show --format=%B --no-patch HEAD | python3 <skill-dir>/scripts/check_commit_message.py --require-signoff -
 ```
 
 ## Repository layout

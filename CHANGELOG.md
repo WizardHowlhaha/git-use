@@ -2,6 +2,13 @@
 
 本文件记录 `git-use` skill 的重要变更，格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [Unreleased]
+
+### 变更
+
+- 移除提交信息中的 AI 辅助披露要求及相关示例，保留真实的 `Signed-off-by` 签署。
+- 提交检查参数由 `--require-disclosure` 改为 `--require-signoff`，只要求签署 trailer；同步更新安装提示、文档和 CI。
+
 ## [1.0.0] - 2026-10-29
 
 首个公开版本。规则来自内部使用的 `git-use` skill，本次整理为独立、可公开发布的 skill 仓库。

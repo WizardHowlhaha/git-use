@@ -1,7 +1,7 @@
 {
   "name": "git-use-skill",
   "version": "1.0.0",
-  "description": "Linux-kernel-style Git commit, AI disclosure and PR content rules packaged as an installable agent skill",
+  "description": "Linux-kernel-style Git commit and PR content rules packaged as an installable agent skill",
   "type": "module",
   "private": false,
   "bin": {
@@ -23,7 +23,7 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "test:python": "python3 -m unittest discover -s test -p 'test_*.py'",
-    "lint:commit": "python3 skill/scripts/check_commit_message.py --require-disclosure -"
+    "lint:commit": "python3 skill/scripts/check_commit_message.py --require-signoff -"
   },
   "keywords": [
     "agent-skill",
@@ -32,7 +32,6 @@
     "commit-message",
     "pull-request",
     "linux-kernel",
-    "ai-disclosure",
     "codex",
     "claude-code",
     "cursor",

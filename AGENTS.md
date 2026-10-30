@@ -12,12 +12,12 @@
 
 - 标题：`<subsystem>: <imperative summary>`，≤ 50 显示列；
 - 正文：问题根因与方案，不写验证流水账；
-- trailer：`AI-Assisted-By`、`AI-Model`、`Signed-off-by`，顺序固定。
+- trailer：使用 `git commit -s` 生成真实签署者的 `Signed-off-by`。
 
 提交前自检：
 
 ```sh
-git show --format=%B --no-patch HEAD | python3 skill/scripts/check_commit_message.py --require-disclosure -
+git show --format=%B --no-patch HEAD | python3 skill/scripts/check_commit_message.py --require-signoff -
 ```
 
 ## 改动边界

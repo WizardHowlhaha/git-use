@@ -1,6 +1,6 @@
 # git-use
 
-把一套 Git 提交与 PR 撰写规范做成可安装的 **agent skill**：按功能模块拆分提交、采用 Linux 内核风格的 commit message 与空白/trailer 约束、按结构化模板撰写 PR，并在提交中披露 AI 辅助信息。
+把一套 Git 提交与 PR 撰写规范做成可安装的 **agent skill**：按功能模块拆分提交、采用 Linux 内核风格的 commit message 与空白/trailer 约束、按结构化模板撰写 PR。
 
 仓库是自包含的公开 skill 仓库：包含 skill 本体、跨 agent 安装器、校验脚本、测试和 CI，可直接发布并被不同 coding agent 安装使用。
 
@@ -10,10 +10,10 @@
 | --- | --- |
 | 提交边界 | 一个提交对应一个功能模块或 feature；独立功能必须拆开；不提交未接通的中间状态 |
 | AI 测试代码 | AI 生成的测试默认只用于本地验证，不纳入提交，除非用户明确要求 |
-| Commit message | `<subsystem>: <imperative summary>`，主题 ≤ 50 显示列；正文 ≤ 75 显示列；trailer 区块连续且顺序固定 |
+| Commit message | `<subsystem>: <imperative summary>`，主题 ≤ 50 显示列；正文 ≤ 75 显示列；trailer 位于正文末尾的连续区块 |
 | 过程信息 | 检查命令、测试结果、`Tested:` 段落只写进对话汇报，不写进提交信息 |
 | Patch 检查 | 暂存后按 `git diff --cached --check` → `--name-status/--stat` → 完整 diff → `checkpatch.pl` 顺序逐项审阅 |
-| AI 披露 | trailer 顺序固定为 `AI-Assisted-By`、`AI-Model`、`Signed-off-by`，位于正文末尾连续区块 |
+| 提交签署 | 使用 `git commit -s` 生成真实签署者的 `Signed-off-by`，位于正文末尾连续区块 |
 | PR 内容 | 英文标题 + 中文正文；背景与目标 → 改动汇总 → 行为说明 → 各提交改动与前置关系；更新 PR 必须同步正文而非追加日志 |
 
 完整规则见 [`skill/SKILL.md`](skill/SKILL.md)，提交信息细则见 [`skill/references/kernel-patch.md`](skill/references/kernel-patch.md)，PR 排版细则见 [`skill/references/pull-request.md`](skill/references/pull-request.md)，规则取舍说明见 [`docs/RULES.md`](docs/RULES.md)。
@@ -65,7 +65,7 @@ agent 会在涉及提交 Git、创建或更新 PR 时自动加载该 skill；也
 校验提交信息（`<skill-dir>` 为安装后的 skill 目录）：
 
 ```sh
-git show --format=%B --no-patch HEAD | python3 <skill-dir>/scripts/check_commit_message.py --require-disclosure -
+git show --format=%B --no-patch HEAD | python3 <skill-dir>/scripts/check_commit_message.py --require-signoff -
 ```
 
 ## 仓库结构
@@ -89,7 +89,7 @@ npm test          # node --test test/*.test.mjs
 npm run test:python   # python3 -m unittest discover -s test
 ```
 
-本仓库自身按 `skill/SKILL.md` 的规则提交：内核风格 subject、连续 trailer 区块、`git commit -s` 与 AI 披露。
+本仓库自身按 `skill/SKILL.md` 的规则提交：内核风格 subject、连续 trailer 区块、`git commit -s` 签署。
 
 ## 许可
 

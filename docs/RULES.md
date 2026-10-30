@@ -24,17 +24,11 @@ Linux 内核的 patch 规范被大量下游项目沿用，原因是它同时满�
 
 这条规则容易被误读成“可以跳过验证”，所以在 SKILL.md 中同时写了“验证要求仍按 SKILL.md 执行”。
 
-## 为什么 trailer 顺序固定
+## 为什么保留提交签署
 
-`AI-Assisted-By`、`AI-Model`、`Signed-off-by` 是一个整体披露区块，固定顺序让下游工具可以用简单的正则提取：
+`Signed-off-by` 表示真实提交者的签署，位于正文末尾的连续 trailer 区块中，使用 `git commit -s` 生成。
 
-```sh
-git log --format='%B' | grep -E '^(AI-Assisted-By|AI-Model|Signed-off-by):'
-```
-
-顺序固定也避免了两类含糊情况：AI 披露被藏在正文中间，以及 `Signed-off-by` 出现在 AI trailer 之前导致工具先读到签署再读到披露。
-
-`Signed-off-by` 只能由真实提交者本人签署，所以脚本不校验它的值，只校验它存在且位置正确；生成方式统一为 `git commit -s`。
+启用 `--require-signoff` 时，脚本检查该 trailer 是否存在，并检查区块格式；签署身份是否真实仍由提交者负责。
 
 ## 为什么 AI 生成的测试默认不进提交
 
@@ -62,11 +56,11 @@ git log --format='%B' | grep -E '^(AI-Assisted-By|AI-Model|Signed-off-by):'
 | 正文行 ≤ 75 显示列（按东亚字宽计算） | 行宽 |
 | 无行尾空格、无制表符、无 CRLF、无连续空行 | 空白规则 |
 | trailer 区块连续、位于正文后、每个 trailer 形如 `Key: value` | trailer 结构 |
-| 存在 `AI-Assisted-By`、`AI-Model`、`Signed-off-by` 且顺序正确 | AI 披露 |
+| 使用 `--require-signoff` 时存在 `Signed-off-by` | 提交签署 |
 | 消息以换行结尾 | 格式完整性 |
 
 脚本**不**检查的部分：标题是否真正描述了改动、正文是否诚实、diff 是否正确、是否应该拆分提交。这些只能由评审者或 agent 判断，脚本刻意不去猜。
 
 ## 与目标仓库规则的关系
 
-仓库自身的贡献规则、维护者要求和 CI 规则**优先于**本 skill 的通用约束。例如某个仓库要求 `feat(scope): ...` 形式的主体、使用自己的 DCO 签核流程，或使用 Jira 编号，都以仓库规则为准；本 skill 的行宽、空白、trailer 顺序等与具体项目无关的约束继续生效。
+仓库自身的贡献规则、维护者要求和 CI 规则**优先于**本 skill 的通用约束。例如某个仓库要求 `feat(scope): ...` 形式的主体、使用自己的 DCO 签核流程，或使用 Jira 编号，都以仓库规则为准；本 skill 的行宽、空白、trailer 格式等与具体项目无关的约束继续生效。

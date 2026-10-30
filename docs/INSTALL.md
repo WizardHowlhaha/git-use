@@ -105,7 +105,7 @@ python3 "$HOME/.codex/skills/git-use/scripts/check_commit_message.py" --help
 # 3. 用一个真实提交做端到端校验
 cd /path/to/your/repo
 git show --format=%B --no-patch HEAD \
-  | python3 "$HOME/.codex/skills/git-use/scripts/check_commit_message.py" --require-disclosure -
+  | python3 "$HOME/.codex/skills/git-use/scripts/check_commit_message.py" --require-signoff -
 ```
 
 第三条输出 `commit-message: OK` 表示标题、正文宽度、空白和 trailer 都符合规则。
@@ -120,7 +120,7 @@ git show --format=%B --no-patch HEAD \
 
 **校验脚本报 `CRLF is not allowed`**：提交信息里混入了 CRLF，检查编辑器或 Git 配置中的换行符设置。
 
-**校验脚本报 `required trailer is missing`**：提交缺少 `AI-Assisted-By`、`AI-Model`、`Signed-off-by` 之一，按 SKILL.md 的顺序补齐。
+**校验脚本报 `required trailer is missing`**：提交缺少 `Signed-off-by`，使用 `git commit -s` 生成真实签署。
 
 ## 从源码安装（开发用）
 

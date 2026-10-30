@@ -87,4 +87,4 @@ jobs:
       - name: Check the repository commit message follows the skill rules
         run: |
           set -eu
-          git log -1 --format=%B | python3 skill/scripts/check_commit_message.py --require-disclosure -
+          git log -1 --format=%B | python3 skill/scripts/check_commit_message.py --require-signoff -

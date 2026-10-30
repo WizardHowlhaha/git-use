@@ -11,7 +11,6 @@ from pathlib import Path
 
 
 TRAILER_RE = re.compile(r"^[A-Za-z][A-Za-z0-9-]*: \S(?:.*\S)?$")
-REQUIRED_TRAILERS = ("AI-Assisted-By", "AI-Model", "Signed-off-by")
 
 
 def display_width(line: str) -> int:
@@ -23,7 +22,7 @@ def display_width(line: str) -> int:
     return width
 
 
-def validate(message: str, require_disclosure: bool) -> list[str]:
+def validate(message: str, require_signoff: bool) -> list[str]:
     errors: list[str] = []
     if "\r" in message:
         errors.append("CRLF is not allowed; use LF line endings")
@@ -67,14 +66,10 @@ def validate(message: str, require_disclosure: bool) -> list[str]:
         if trailer_start == 0 or lines[trailer_start - 1] != "":
             errors.append("trailer block must be preceded by one blank line")
         keys = [line.split(":", 1)[0] for line in trailers]
-        if require_disclosure:
-            for key in REQUIRED_TRAILERS:
-                if key not in keys:
-                    errors.append(f"required trailer is missing: {key}")
-            if keys[-len(REQUIRED_TRAILERS):] != list(REQUIRED_TRAILERS):
-                errors.append("AI disclosure trailers must end in AI-Assisted-By, AI-Model, Signed-off-by order")
-    elif require_disclosure:
-        errors.append("required AI disclosure trailer block is missing")
+        if require_signoff and "Signed-off-by" not in keys:
+            errors.append("required trailer is missing: Signed-off-by")
+    elif require_signoff:
+        errors.append("required trailer is missing: Signed-off-by")
 
     for index, line in enumerate(lines[1:], start=2):
         if display_width(line) > 75:
@@ -84,11 +79,11 @@ def validate(message: str, require_disclosure: bool) -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--require-disclosure", action="store_true")
+    parser.add_argument("--require-signoff", action="store_true")
     parser.add_argument("message", nargs="?", default="-")
     args = parser.parse_args()
     content = sys.stdin.read() if args.message == "-" else Path(args.message).read_text(encoding="utf-8")
-    errors = validate(content, args.require_disclosure)
+    errors = validate(content, args.require_signoff)
     if errors:
         for error in errors:
             print(f"commit-message: error: {error}", file=sys.stderr)

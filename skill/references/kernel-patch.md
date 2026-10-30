@@ -40,7 +40,7 @@ git diff --cached --no-ext-diff --unified=3 \
 ```sh
 git show --check --stat --oneline HEAD
 git show --format=format:%B --no-patch HEAD \
-  | python3 scripts/check_commit_message.py --require-disclosure -
+  | python3 scripts/check_commit_message.py --require-signoff -
 ```
 
 `git show --check` 用于确认最终提交的 patch 没有空白错误；提交信息检查用于确认 rebase、钩子或编辑器没有破坏标题、正文或 trailer。

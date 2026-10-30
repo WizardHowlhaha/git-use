@@ -344,7 +344,7 @@ async function install(args) {
   }
   console.log("");
   console.log("Next: ask your agent to use the git-use skill, then verify with:");
-  console.log(`  git show --format=%B --no-patch HEAD | python3 ${SKILL_NAME}/scripts/check_commit_message.py --require-disclosure -`);
+  console.log(`  git show --format=%B --no-patch HEAD | python3 ${SKILL_NAME}/scripts/check_commit_message.py --require-signoff -`);
 }
 
 async function uninstall(args) {

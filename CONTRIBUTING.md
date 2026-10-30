@@ -29,12 +29,12 @@ test/           # 测试
 
 - 提交标题为 `<subsystem>: <imperative summary>`，不超过 50 显示列；
 - 正文说明问题与方案，不写测试命令与验证结果；
-- trailer 区块顺序固定为 `AI-Assisted-By`、`AI-Model`、`Signed-off-by`，使用 `git commit -s` 生成签署。
+- trailer 位于正文末尾的连续区块，使用 `git commit -s` 生成真实签署者的 `Signed-off-by`。
 
 提交前可以自检：
 
 ```sh
-git show --format=%B --no-patch HEAD | python3 skill/scripts/check_commit_message.py --require-disclosure -
+git show --format=%B --no-patch HEAD | python3 skill/scripts/check_commit_message.py --require-signoff -
 ```
 
 ## 修改规则时的注意事项

@@ -18,8 +18,6 @@ The reconnect path treated a reset peer as a transient timeout and
 requeued the same request without changing state. Stop retrying after the
 reset is recorded so the caller receives the original failure.
 
-AI-Assisted-By: MiniMax Code
-AI-Model: MiniMax-M3
 Signed-off-by: Ethan Liu <ethan.liu.wiz@gmail.com>
 """
 
@@ -31,27 +29,6 @@ class ValidateTest(unittest.TestCase):
     def test_valid_message_without_disclosure_requirement(self):
         message = "net: fix retry loop\n\nBody line.\n"
         self.assertEqual(module.validate(message, False), [])
-
-    def test_missing_disclosure_trailers(self):
-        message = "net: fix retry loop\n\nBody line.\n"
-        errors = module.validate(message, True)
-        self.assertTrue(any("disclosure trailer block is missing" in error for error in errors))
-
-    def test_missing_single_disclosure_trailer(self):
-        message = (
-            "net: fix retry loop\n\nBody line.\n\n"
-            "AI-Assisted-By: MiniMax Code\nAI-Model: MiniMax-M3\n"
-        )
-        errors = module.validate(message, True)
-        self.assertTrue(any("required trailer is missing" in error for error in errors))
-
-    def test_trailer_order_is_enforced(self):
-        message = VALID.replace(
-            "AI-Assisted-By: MiniMax Code\nAI-Model: MiniMax-M3\n",
-            "AI-Model: MiniMax-M3\nAI-Assisted-By: MiniMax Code\n",
-        )
-        errors = module.validate(message, True)
-        self.assertTrue(any("order" in error for error in errors))
 
     def test_subject_length_is_limited_to_50_columns(self):
         subject = "net: " + "a" * 60

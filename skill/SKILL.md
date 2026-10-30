@@ -1,6 +1,6 @@
 ---
 name: git-use
-description: 用于项目 coding 开发与维护：按功能模块组织 Git 修改、验证和提交；需要提交 Git、创建或更新 PR 时，遵循 Linux 内核风格的 patch、commit message、空白与 trailer 约束，结构化的 PR 内容与排版规则，并披露 AI 辅助信息。适用于 Codex、Claude Code、Cursor、Gemini CLI、OpenCode、Mavis 等支持 SKILL.md 的 agent。
+description: 用于项目 coding 开发与维护：按功能模块组织 Git 修改、验证和提交；需要提交 Git、创建或更新 PR 时，遵循 Linux 内核风格的 patch、commit message、空白与 trailer 约束，结构化的 PR 内容与排版规则。适用于 Codex、Claude Code、Cursor、Gemini CLI、OpenCode、Mavis 等支持 SKILL.md 的 agent。
 ---
 
 # Git 使用规范
@@ -36,8 +36,7 @@ description: 用于项目 coding 开发与维护：按功能模块组织 Git 修
 - 提交信息不包含过程性信息：检查命令、测试或验证结果、未执行验证的说明，以及 `Tested:`、`Validated with` 等段落。这些内容仅在对话汇报中说明；必要的验证仍须执行。
 - 正文普通段落每行不超过 75 个显示列；段落之间只留一个空行；不得有行尾空格、制表符、CRLF 或连续空行。
 - trailer 是连续的尾部区块，每行一个 `Key: value`，区块前留一个空行，区块内部不得插入空行或折行。
-- AI 参与时，trailer 顺序固定为 `AI-Assisted-By`、`AI-Model`、`Signed-off-by`；`Signed-off-by` 必须是实际签署者，并使用 `git commit -s` 或等价方式生成，不能猜测姓名或邮箱。
-- `AI-Model` 必须填写实际模型标识。优先使用当前 agent 运行时暴露的模型标识；无法从运行时取得时，读取本地 agent 配置中的 `model` 字段原样填写，不做别名或模型映射。
+- `Signed-off-by` 必须是实际签署者，并使用 `git commit -s` 或等价方式生成，不能猜测姓名或邮箱。
 - 不添加没有实际审查或签署的 `Reviewed-by`、`Acked-by`、`Co-authored-by` 或其他署名 trailer。
 
 示例：
@@ -49,21 +48,19 @@ The reconnect path treated a reset peer as a transient timeout and
 requeued the same request without changing state. Stop retrying after the
 reset is recorded so the caller receives the original failure.
 
-AI-Assisted-By: <agent or tool name>
-AI-Model: <actual model identifier>
 Signed-off-by: Your Name <your@email.com>
 ```
 
 提交前可运行入口脚本检查提交信息。脚本位于本 skill 目录下的 `scripts/check_commit_message.py`，路径相对于本 `SKILL.md` 所在目录：
 
 ```sh
-python3 scripts/check_commit_message.py --require-disclosure COMMIT_MSG
+python3 scripts/check_commit_message.py --require-signoff COMMIT_MSG
 ```
 
 脚本支持从标准输入读取，便于直接校验提交对象：
 
 ```sh
-git show --format=%B --no-patch HEAD | python3 scripts/check_commit_message.py --require-disclosure -
+git show --format=%B --no-patch HEAD | python3 scripts/check_commit_message.py --require-signoff -
 ```
 
 ## 提交前 patch 检查
@@ -81,7 +78,7 @@ git show --format=%B --no-patch HEAD | python3 scripts/check_commit_message.py -
 
 ```sh
 git show --check --stat --oneline HEAD
-git show --format=%B --no-patch HEAD | python3 scripts/check_commit_message.py --require-disclosure -
+git show --format=%B --no-patch HEAD | python3 scripts/check_commit_message.py --require-signoff -
 git status --short --branch
 ```
 
@@ -90,7 +87,7 @@ git status --short --branch
 1. 检查状态和历史，确定 feature 边界与基准 `HEAD`。
 2. 只实现并验证该 feature，完成上面的 staged patch 检查。
 3. 只暂存相关路径或片段，默认不要暂存整个工作区；AI 生成的测试代码按上述规则排除。
-4. 检查 `git diff --cached` 和提交信息；确认 `Signed-off-by`、AI 披露和 trailer 顺序完整。
+4. 检查 `git diff --cached` 和提交信息；确认 `Signed-off-by` 和 trailer 区块格式完整。
 5. 使用 `git commit -s` 创建提交。若仓库已有提交钩子或维护者额外要求，优先遵循仓库规则。
 6. 创建提交后运行提交后检查，并确认工作区没有意外文件。
 
@@ -106,15 +103,3 @@ git status --short --branch
 - PR 中每个提交条目通常用一至两句说明根因与解决方案，仅在必要时补充前置关系；不写测试命令、验证结果、测试数量、日志回放过程或未执行验证的说明。验证结果在对话中汇报；用户明确要求或仓库模板要求时，放在独立验证章节。
 - PR 正文与 commit message 分别编写，不机械套用提交信息的行宽或 trailer；量化结论必须有对应依据。PR 文案调整不自动授权重写已推送的 Git 历史；明确要求修改 Git 提交信息时再处理提交历史。
 - 创建或更新时优先使用结构化工具的正文参数；使用 `gh` 时将 Markdown 写入临时文件并通过 `--body-file` 传入。发布后读取实际标题和正文，逐节核对新增行为、提交范围及 Markdown 排版；平台支持时将 PR 关联到当前任务。
-
-## AI 辅助开发披露
-
-当 AI 实质参与代码、测试、文档或提交信息编写时，每个受影响提交的正文末尾必须包含：
-
-```text
-AI-Assisted-By: <agent or tool name>
-AI-Model: <actual model identifier>
-Signed-off-by: Your Name <your@email.com>
-```
-
-这些 trailer 必须位于正文之后的连续尾部区块，顺序不可变；`Signed-off-by` 仍须由实际提交者确认。它们用于可追溯披露，不替代开发者对代码的理解、验证或真实签署。
